@@ -3,9 +3,10 @@ const express = require('express');
 const fs = require('fs');
 const formidable = require('formidable');
 const glob = require('glob');
+const path = require('path');
 
 const isDeveloping = process.env.NODE_ENV !== 'production';
-const port = isDeveloping ? 4001 : process.env.PORT;
+const port = isDeveloping ? 5000 : process.env.PORT;
 const app = express();
 
 app.use((req, res, next) => {
@@ -41,6 +42,21 @@ app.post('/savefile', (req, res) => {
     } else {
       console.log('no audio found');
       res.status(204).send('no audio found');
+    }
+  });
+});
+
+// delete files
+app.use('/deletefiles', (req, res) => {
+  const directory = 'outputs';
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err;
+
+    for (const file of files) {
+      fs.unlink(path.join(directory, file), err => {
+        if (err) throw err;
+        res.status(200).send('files deleted!');
+      });
     }
   });
 });
